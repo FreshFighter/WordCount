@@ -11,59 +11,127 @@ namespace wordCountClassLibrary
     /// </summary>
     public class CountWords
     {
-        public string text;
-        public CountWords(string s)
+        private List<string> textlist = new List<string>();
+        //private string[] wordlist = Extract_words();
+        public CountWords(List<string> textlist)
         {
-            this.text = s;
+            this.textlist = textlist;
         }
+
+
+        /// <summary>
+        /// 将单词提取出来的函数
+        /// </summary>
+        /// <returns>单词字符串数组</returns>
+        private string[] Extract_words()
+        {
+            if (this.textlist != null)
+            {
+                List<string> temp = new List<string>();
+                int flag = 0;
+                foreach (var words in textlist)
+                {
+                    string[] word = words.ToLower().Split(new char[] { ' ',':', ',', '.', '?', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var s in word)
+                    {
+                        flag = 0;
+                        foreach (var c in s)
+                        {
+                            if ((c < 97 && c > 57) || c > 122 || c < 48)
+                            {
+                                flag = 1;
+                                break;
+                            }
+                        }
+                        if (flag == 1)
+                            continue;
+                        temp.Add(s);
+                    }
+                }
+                string[] wordlist = new string[temp.LongCount()];
+                int i = -1;
+                foreach (var s in temp)
+                    wordlist[++i] = s;
+                return wordlist;
+            }
+            else
+            {
+                Console.WriteLine("文件为空");
+                return null;
+            }
+        }
+
+
         /// <summary>
         /// 统计单词数的函数
         /// </summary>
-        /// <returns>单词数</returns>
-        public int Count_word()
+        /// <returns>单词数字符串</returns>
+        public string Count_word()
         {
-            if(this.text!=null)
+            int count = 0;//用来记数;
+            string[] wordlist = Extract_words();
+            foreach (var s in wordlist) 
             {
-                int count = 0;//用来记数
-                string[] wordList = this.text.ToLower().Split(",.' ?!\r\n".ToCharArray());
-                foreach (string word in wordList)
-                    if (word.Length > 0)
-                        ++count;
-                Console.WriteLine("words:" + count);
-                return count;
+                //Console.WriteLine(s);
+                if (s.Length < 4 || (s[0] < 97 && s[0] > 122) || (s[1] < 97 && s[1] > 122) || (s[2] < 97 && s[2] > 122) || (s[3] < 97 && s[3] > 122))
+                    continue;
+                ++count;
             }
-            else
-            {
-                Console.WriteLine("文件为空");
-                return 0;
-            }
+            return "words:" + count;
         }
+
+
+
         /// <summary>
         /// 统计词频的函数
         /// </summary>
-        /// <returns>词频最高的单词的频数</returns>
-        public int Count_word_frequency()
+        /// <returns>前num个单词的词频字符串数组</returns>
+        public string[] Count_word_frequency(int num)
         {
-            if (this.text != null)
+            List<string> temp = new List<string>();
+            string[] wordlist = Extract_words();
+            foreach (var s in  wordlist)
             {
-                string[] wordList = this.text.ToLower().Split(",.' ?!\r\n".ToCharArray());
-                var List = wordList.GroupBy(x => x).OrderByDescending(x => x.Count());
-                int i = 0;
-                foreach (var word in List)
-                {
-                    if (word.Key != List.Last().Key)
-                        Console.WriteLine(word.Key + ":" + word.Count());
-                    ++i;
-                    if (i == 10)
-                        break;
-                }
-                return List.First().Count();
+                if (s.Length < 4 || (s[0] < 97 && s[0] > 122) || (s[1] < 97 && s[1] > 122) || (s[2] < 97 && s[2] > 122) || (s[3] < 97 && s[3] > 122))
+                    continue;
+                temp.Add(s);
             }
-            else
+            int k = -1;
+            string[] ss = new string[temp.LongCount()];
+            foreach (var s in temp)
+                ss[++k] = s;
+            var List = ss.GroupBy(x => x).OrderByDescending(x => x.Count());
+            string[] frequency = new string[num];
+            int j = 0;
+            foreach (var s in List)
             {
-                Console.WriteLine("文件为空");
-                return 0;
+                frequency[j++] = s.Key + ":" + s.Count();
+                if (j == num)
+                    break;
             }
+            return frequency;
+        }
+
+
+
+
+        public string[] Count_Phrase(int a)
+        {
+            string[] wordlist = Extract_words();
+            string[] phraseList = new string[wordlist.LongCount() - a + 1];
+            for (int i = 0; i < wordlist.LongCount() - a + 1; i++)
+            {
+                string str = null;
+                for (int k = 1; k < a; k++)
+                    str += wordlist[i+k] + " ";
+                phraseList[i] = str;
+            }
+            var List = phraseList.GroupBy(x => x).OrderByDescending(x => x.Count());
+            string[] phraseList1 = new string[List.Count()];
+            int j = 0;
+            foreach (var s in List)
+                phraseList1[j++] = s.Key + ":" + s.Count();
+            return phraseList1;
         }
     }
 }

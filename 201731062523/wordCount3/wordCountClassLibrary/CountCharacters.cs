@@ -11,32 +11,30 @@ namespace wordCountClassLibrary
     /// </summary>
     public class CountCharacters
     {
-        public string text;
-        public CountCharacters(string s)
+        private List<string> textlist = new List<string>();
+        public CountCharacters(List<string> textlist)
         {
-            this.text = s;
+            this.textlist = textlist;
         }
         /// <summary>
         /// 统计字符数的函数
         /// </summary>
         /// <returns>字符个数</returns>
-        public int Count_character()
+        public string Count_character()
         {
-            if(this.text!=null)
+            if(this.textlist != null)
             {
                 int count = 0;
-                foreach (char ascii in this.text)
+                foreach(var s in textlist)
                 {
-                    if (ascii >= 0 && ascii <= 127)
-                        ++count;
+                    count += s.Length;
                 }
-                Console.WriteLine("characters:" + count);
-                return count;
+                return "characters:" + count;
             }
             else
             {
                 Console.WriteLine("文件为空");
-                return 0;
+                return null;
             }
         }
     }
